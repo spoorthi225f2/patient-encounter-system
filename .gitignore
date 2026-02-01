@@ -1,0 +1,39 @@
+# Python / Pycache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment / Poetry
+.venv/
+env/
+venv/
+bin/
+lib/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.installed.cfg
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project Specific
+# We ignore the reset script and any local environment files
+src/reset_db.py
+.env
+
+# Database
+*.sqlite
+*.db
