@@ -34,6 +34,7 @@ patient-encounter-system/
 │   ├── services/        # Business logic & overlap rules
 ├── tests/               # Pytest suite
 ├── .github/workflows/   # CI/CD configs
+├── .bandit              #BANDIT
 ├── pyproject.toml       # Poetry dependencies
 ├── requirements.txt     # Requirements
 └── README.md
