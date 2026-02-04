@@ -10,38 +10,60 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      PYTHONPATH: .
+      ENV: test
+      DATABASE_URL: sqlite:///./test.db
+
     steps:
-    - uses: actions/checkout@v4
+      # 1️⃣ Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.10"
+      # 2️⃣ Setup Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
 
-    - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
+      # 3️⃣ Install Poetry
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          poetry --version
 
-    - name: Install dependencies
-      run: |
-        poetry install --no-root
+      # 4️⃣ Configure Poetry (important for CI)
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
 
-    - name: Lint with ruff
-      run: |
-        poetry run ruff check src
+      # 5️⃣ Install dependencies
+      - name: Install dependencies
+        run: |
+          poetry install --no-interaction --no-root
 
-    - name: Check formatting with black
-      run: |
-        poetry run black --check src
+      # 6️⃣ Ruff linting
+      - name: Lint with Ruff
+        run: |
+          poetry run ruff check src
 
-    - name: Security check with bandit
-      run: |
-        poetry run bandit -r src -ll
+      # 7️⃣ Black formatting check
+      - name: Check formatting with Black
+        run: |
+          poetry run black --check src
 
-    - name: Run tests with coverage
-      # We set PYTHONPATH=. so the runner can find 'src'
-      env:
-        PYTHONPATH: .
-      run: |
-        poetry run python -m pytest --cov=src --cov-report=term-missing --cov-fail-under=80
+      # 8️⃣ Security scan
+      - name: Security scan with Bandit
+        run: |
+          poetry run bandit -r src -ll
+
+      # 9️⃣ Run tests with coverage
+      - name: Run tests with coverage
+        run: |
+          poetry run pytest \
+            --cov=src \
+            --cov-report=term-missing \
+            --cov-fail-under=80

@@ -1,14 +1,43 @@
+import os
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
 
-# Database URL for MySQL/PyMySQL
-DATABASE_URL = "mysql+pymysql://mongouhd_evernorth:U*dgQkKRuEHe@cp-15.webhostbox.net:3306/mongouhd_evernorth"
+# -------------------------------------------------
+# Load environment variables (.env for local)
+# -------------------------------------------------
+load_dotenv()
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# -------------------------------------------------
+# Database URL
+# - Local: MySQL from .env
+# - CI/Test: SQLite in-memory fallback
+# -------------------------------------------------
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "sqlite+pysqlite:///./test.db"  # fallback for CI / tests
+)
 
-# Naming convention for tables
+# -------------------------------------------------
+# SQLAlchemy Engine
+# -------------------------------------------------
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    future=True,
+)
+
+# -------------------------------------------------
+# Session factory
+# -------------------------------------------------
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+)
+
+# -------------------------------------------------
+# Naming convention (production-grade)
+# -------------------------------------------------
 metadata = MetaData(
     naming_convention={
         "ix": "ix_spoorthi_%(column_0_label)s",
@@ -19,9 +48,15 @@ metadata = MetaData(
     }
 )
 
+# -------------------------------------------------
+# Declarative Base (SQLAlchemy 2.0 compatible)
+# -------------------------------------------------
 Base = declarative_base(metadata=metadata)
 
 
+# -------------------------------------------------
+# Dependency for FastAPI
+# -------------------------------------------------
 def get_db():
     db = SessionLocal()
     try:
