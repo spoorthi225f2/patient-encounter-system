@@ -93,6 +93,3 @@ poetry run pytest --cov=src --cov-report=term-missing --cov-fail-under=80
 2. **Future-Only**: Appointments must be scheduled ahead of time.  
 3. **Duration Control**: Encounters must last between 15–180 minutes.  
 4. **Data Integrity**: Records linked to appointments cannot be deleted.
-```
-
----
